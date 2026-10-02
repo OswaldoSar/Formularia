@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Inventario SISCO del Estrés Académico - formulario web de investigación" />
+  <title>Inventario SISCO del Estrés Académico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --surface:#ffffff;
+      --surface-soft:#f8fafc;
+      --text:#172033;
+      --muted:#667085;
+      --primary:#173f5f;
+      --primary-2:#20639b;
+      --accent:#2aa198;
+      --border:#e4e7ec;
+      --danger:#b42318;
+      --success:#027a48;
+      --shadow:0 16px 40px rgba(16,24,40,.08);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      background:linear-gradient(180deg,#eef4fa 0,#f7f9fc 240px,#f5f7fb 100%);
+      color:var(--text);
+    }
+    .hero{
+      background:linear-gradient(135deg,var(--primary) 0%,var(--primary-2) 58%,#2b7a78 100%);
+      color:white;
+      padding:42px 18px 72px;
+    }
+    .hero-inner{max-width:980px;margin:auto}
+    .eyebrow{
+      display:inline-flex;gap:8px;align-items:center;
+      font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+      background:rgba(255,255,255,.12);padding:8px 12px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.16)
+    }
+    .hero h1{font-size:clamp(2rem,4vw,3.6rem);line-height:1.06;margin:18px 0 12px;max-width:820px}
+    .hero p{max-width:760px;line-height:1.7;color:rgba(255,255,255,.88);margin:0}
+    .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+    .chip{padding:8px 11px;border-radius:999px;background:rgba(255,255,255,.1);font-size:.86rem}
+
+    .shell{max-width:980px;margin:-42px auto 64px;padding:0 18px}
+    .card{
+      background:var(--surface);border:1px solid rgba(228,231,236,.9);border-radius:var(--radius);
+      box-shadow:var(--shadow);padding:24px;margin-bottom:18px;
+    }
+    .progress-card{position:sticky;top:10px;z-index:50;padding:14px 18px}
+    .progress-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:10px;font-size:.9rem}
+    .progress-track{height:9px;background:#edf1f5;border-radius:999px;overflow:hidden}
+    .progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--primary-2));transition:width .2s ease}
+    .section-tag{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--primary-2)}
+    h2{font-size:1.35rem;margin:7px 0 8px}
+    .lead,.hint{color:var(--muted);line-height:1.65}
+    .notice{background:#f0f7fb;border-left:4px solid var(--primary-2);padding:14px 16px;border-radius:12px;color:#324a5f;line-height:1.6}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .field label{display:block;font-weight:700;font-size:.9rem;margin-bottom:7px}
+    .field input,.field select,.field textarea{
+      width:100%;padding:13px 14px;border:1px solid var(--border);border-radius:12px;background:white;
+      color:var(--text);font:inherit;outline:none;transition:.18s;
+    }
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary-2);box-shadow:0 0 0 4px rgba(32,99,155,.1)}
+    .question{padding:18px 0;border-top:1px solid #eef1f4}
+    .question:first-of-type{border-top:0}
+    .q-title{font-weight:750;line-height:1.55;margin-bottom:12px}
+    .q-num{display:inline-flex;min-width:30px;height:30px;align-items:center;justify-content:center;border-radius:9px;background:#eaf2f8;color:var(--primary);margin-right:8px;font-size:.84rem}
+    .options{
+      display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px
+    }
+    .options.binary{grid-template-columns:repeat(2,minmax(0,180px))}
+    .option input{position:absolute;opacity:0;pointer-events:none}
+    .option label{
+      display:flex;min-height:54px;align-items:center;justify-content:center;text-align:center;
+      padding:10px 8px;border:1px solid var(--border);border-radius:12px;background:var(--surface-soft);
+      cursor:pointer;font-size:.84rem;font-weight:650;color:#344054;transition:.15s;
+    }
+    .option input:checked + label{
+      background:#e6f3f2;border-color:var(--accent);color:#125f59;box-shadow:0 0 0 2px rgba(42,161,152,.12)
+    }
+    .option label:hover{transform:translateY(-1px);border-color:#aeb8c4;background:white}
+    .scale-legend{
+      display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:10px 0 2px;color:var(--muted);font-size:.72rem;text-align:center
+    }
+    .other-box{margin-top:14px;padding-top:14px;border-top:1px dashed var(--border)}
+    .actions{display:flex;justify-content:flex-end;gap:12px;align-items:center;margin-top:8px}
+    .btn{
+      border:0;border-radius:12px;padding:13px 18px;font:inherit;font-weight:800;cursor:pointer;transition:.18s
+    }
+    .btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-2));color:white}
+    .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(23,63,95,.18)}
+    .btn-secondary{background:#eef2f6;color:#344054}
+    .status{font-size:.9rem;color:var(--muted)}
+    .error{color:var(--danger);font-size:.82rem;margin-top:8px;display:none}
+    .hidden{display:none!important}
+    .finish{
+      padding:32px;text-align:center
+    }
+    .finish .icon{
+      width:62px;height:62px;border-radius:50%;display:grid;place-items:center;margin:0 auto 15px;
+      background:#ecfdf3;color:var(--success);font-size:1.8rem;font-weight:900
+    }
+    footer{text-align:center;color:var(--muted);font-size:.78rem;padding:10px 18px 40px}
+    @media(max-width:760px){
+      .grid{grid-template-columns:1fr}
+      .card{padding:18px}
+      .options{grid-template-columns:1fr}
+      .scale-legend{display:none}
+      .option label{justify-content:flex-start;text-align:left}
+      .progress-card{top:0;border-radius:0;margin-left:-18px;margin-right:-18px}
+      .hero{padding-top:32px}
+      .actions{flex-direction:column;align-items:stretch}
+      .btn{width:100%}
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <span class="eyebrow">Instrumento de investigación</span>
+      <h1>Inventario SISCO del Estrés Académico</h1>
+      <p>
+        Cuestionario de 31 ítems para reconocer características del estrés académico.
+        La participación es voluntaria y la información se gestiona de forma confidencial,
+        utilizando resultados globales.
+      </p>
+      <div class="meta">
+        <span class="chip">31 ítems</span>
+        <span class="chip">Escala 1–5</span>
+        <span class="chip">Diseño responsivo</span>
+        <span class="chip">Uso académico</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <div class="card progress-card">
+      <div class="progress-head">
+        <strong>Progreso del cuestionario</strong>
+        <span id="progressText">0%</span>
+      </div>
+      <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
+    </div>
+
+    <form id="siscoForm" novalidate>
+      <section class="card">
+        <div class="section-tag">Antes de comenzar</div>
+        <h2>Información y consentimiento</h2>
+        <div class="notice">
+          El cuestionario busca reconocer las características del estrés que suele acompañar a los estudiantes durante sus estudios.
+          Responda con sinceridad. La información es confidencial y se trabajará de manera global.
+          La participación es voluntaria.
+        </div>
+        <p class="hint">Los campos “Otra (especifique)” son opcionales y no forman parte del conteo de 31 ítems ni del puntaje dimensional.</p>
+      </section>
+
+      <section class="card">
+        <div class="section-tag">Datos generales</div>
+        <h2>Información del participante</h2>
+        <p class="lead">Complete los siguientes datos para caracterizar la muestra.</p>
+        <div class="grid">
+          <div class="field">
+            <label for="edad">Edad *</label>
+            <input id="edad" name="edad" type="number" min="10" max="100" inputmode="numeric" required placeholder="Ej. 16">
+          </div>
+          <div class="field">
+            <label for="sexo">Sexo *</label>
+            <select id="sexo" name="sexo" required>
+              <option value="">Seleccione una opción</option>
+              <option>Femenino</option>
+              <option>Masculino</option>
+              <option>Prefiero no indicar</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="grado">Grado *</label>
+            <input id="grado" name="grado" type="text" required placeholder="Ej. 5.º de secundaria">
+          </div>
+          <div class="field">
+            <label for="seccion">Sección *</label>
+            <input id="seccion" name="seccion" type="text" required placeholder="Ej. A">
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="filterSection">
+        <div class="section-tag">Ítem 1 · Filtro</div>
+        <h2>Experiencia de preocupación o nerviosismo</h2>
+        <div class="question">
+          <div class="q-title"><span class="q-num">1</span>Durante el transcurso de este semestre ¿has tenido momentos de preocupación o nerviosismo?</div>
+          <div class="options binary">
+            <div class="option"><input type="radio" id="q1_si" name="q1" value="Sí" required><label for="q1_si">Sí</label></div>
+            <div class="option"><input type="radio" id="q1_no" name="q1" value="No"><label for="q1_no">No</label></div>
+          </div>
+          <div class="error" id="q1Error">Seleccione una respuesta para continuar.</div>
+        </div>
+      </section>
+
+      <div id="mainQuestions" class="hidden">
+        <section class="card">
+          <div class="section-tag">Ítem 2</div>
+          <h2>Intensidad global percibida</h2>
+          <p class="lead">En una escala del 1 al 5, señala tu nivel de preocupación o nerviosismo, donde 1 es poco y 5 es mucho.</p>
+          <div id="q2Container"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-tag">Ítems 3–10</div>
+          <h2>Dimensión: Estresores</h2>
+          <p class="lead">1 = Nunca · 2 = Rara vez · 3 = Algunas veces · 4 = Casi siempre · 5 = Siempre.</p>
+          <div id="stressors"></div>
+          <div class="other-box field">
+            <label for="otra_estresor">Otra situación que te inquietó (opcional)</label>
+            <input id="otra_estresor" name="otra_estresor" type="text" placeholder="Especifique">
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-tag">Ítems 11–16</div>
+          <h2>Síntomas: reacciones físicas</h2>
+          <p class="lead">Señala con qué frecuencia tuviste las siguientes reacciones cuando estabas preocupado o nervioso.</p>
+          <div id="physical"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-tag">Ítems 17–21</div>
+          <h2>Síntomas: reacciones psicológicas</h2>
+          <p class="lead">Señala con qué frecuencia tuviste las siguientes reacciones cuando estabas preocupado o nervioso.</p>
+          <div id="psychological"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-tag">Ítems 22–25</div>
+          <h2>Síntomas: reacciones comportamentales</h2>
+          <p class="lead">Señala con qué frecuencia tuviste las siguientes reacciones cuando estabas preocupado o nervioso.</p>
+          <div id="behavioral"></div>
+          <div class="other-box field">
+            <label for="otra_comportamental">Otra reacción comportamental (opcional)</label>
+            <input id="otra_comportamental" name="otra_comportamental" type="text" placeholder="Especifique">
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-tag">Ítems 26–31</div>
+          <h2>Dimensión: Estrategias de afrontamiento</h2>
+          <p class="lead">Señala con qué frecuencia utilizaste las siguientes estrategias para enfrentar la situación que te causaba preocupación o nerviosismo.</p>
+          <div id="coping"></div>
+          <div class="other-box field">
+            <label for="otra_afrontamiento">Otra estrategia de afrontamiento (opcional)</label>
+            <input id="otra_afrontamiento" name="otra_afrontamiento" type="text" placeholder="Especifique">
+          </div>
+        </section>
+      </div>
+
+      <section class="card" id="submitCard">
+        <div class="actions">
+          <span class="status" id="statusText">Revise sus respuestas antes de finalizar.</span>
+          <button class="btn btn-primary" type="submit">Enviar respuestas</button>
+        </div>
+      </section>
+    </form>
+
+    <section class="card finish hidden" id="finishCard">
+      <div class="icon">✓</div>
+      <h2>Respuesta registrada</h2>
+      <p class="lead" id="finishMessage">Gracias por participar.</p>
+      <button class="btn btn-secondary" type="button" onclick="location.reload()">Registrar otra respuesta</button>
+    </section>
+  </main>
+
+  <footer>
+    Formulario académico · Inventario SISCO del Estrés Académico
+  </footer>
+
+  <script>
+    // ------------------------------------------------------------
+    // CONFIGURACIÓN
+    // Coloca aquí tu endpoint de Google Apps Script / Formspree / backend.
+    // Ejemplo: const SUBMIT_ENDPOINT = "https://script.google.com/macros/s/XXXX/exec";
+    // Si queda vacío, el formulario funcionará en modo demostración y descargará un JSON.
+    // ------------------------------------------------------------
+    const SUBMIT_ENDPOINT = "";
+
+    const scale = [
+      {value:"1", label:"1 · Nunca"},
+      {value:"2", label:"2 · Rara vez"},
+      {value:"3", label:"3 · Algunas veces"},
+      {value:"4", label:"4 · Casi siempre"},
+      {value:"5", label:"5 · Siempre"}
+    ];
+
+    const questions = {
+      stressors: [
+        [3,"La competencia con los compañeros del grupo."],
+        [4,"Sobrecarga de tareas y trabajos escolares."],
+        [5,"La personalidad y el carácter del profesor."],
+        [6,"Las evaluaciones de los profesores (exámenes, ensayos, trabajos de investigación, etc.)."],
+        [7,"El tipo de trabajo que te piden los profesores (consulta de temas, fichas de trabajo, ensayos, mapas conceptuales, etc.)."],
+        [8,"No entender los temas que se abordan en la clase."],
+        [9,"Participación en clase (responder a preguntas, exposiciones, etc.)."],
+        [10,"Tiempo limitado para hacer el trabajo."]
+      ],
+      physical: [
+        [11,"Trastornos en el sueño (insomnio o pesadillas)."],
+        [12,"Fatiga crónica (cansancio permanente)."],
+        [13,"Dolores de cabeza o migrañas."],
+        [14,"Problemas de digestión, dolor abdominal o diarrea."],
+        [15,"Rascarse, morderse las uñas, frotarse, etc."],
+        [16,"Somnolencia o mayor necesidad de dormir."]
+      ],
+      psychological: [
+        [17,"Inquietud (incapacidad de relajarse y estar tranquilo)."],
+        [18,"Sentimientos de depresión y tristeza (decaído)."],
+        [19,"Ansiedad, angustia o desesperación."],
+        [20,"Problemas de concentración."],
+        [21,"Sentimiento de agresividad o aumento de irritabilidad."]
+      ],
+      behavioral: [
+        [22,"Conflictos o tendencia a polemizar o discutir."],
+        [23,"Aislamiento de los demás."],
+        [24,"Desgano para realizar las labores escolares."],
+        [25,"Aumento o reducción del consumo de alimentos."]
+      ],
+      coping: [
+        [26,"Habilidad asertiva (defender nuestras preferencias, ideas o sentimientos sin dañar a otros)."],
+        [27,"Elaboración de un plan y ejecución de sus tareas."],
+        [28,"Elogios a sí mismo."],
+        [29,"La religiosidad (oraciones o asistencia a misa)."],
+        [30,"Búsqueda de información sobre la situación."],
+        [31,"Ventilación y confidencias (verbalización de la situación que preocupa)."]
+      ]
+    };
+
+    const form = document.getElementById("siscoForm");
+    const mainQuestions = document.getElementById("mainQuestions");
+    const finishCard = document.getElementById("finishCard");
+    const submitCard = document.getElementById("submitCard");
+    const progressBar = document.getElementById("progressBar");
+    const progressText = document.getElementById("progressText");
+
+    function questionHTML(num, text, labels = scale){
+      const opts = labels.map((o,i)=>`
+        <div class="option">
+          <input type="radio" id="q${num}_${o.value}" name="q${num}" value="${o.value}" required>
+          <label for="q${num}_${o.value}">${o.label}</label>
+        </div>`).join("");
+
+      return `
+        <div class="question" data-question="${num}">
+          <div class="q-title"><span class="q-num">${num}</span>${text}</div>
+          <div class="options">${opts}</div>
+        </div>`;
+    }
+
+    function renderQuestions(){
+      document.getElementById("q2Container").innerHTML = questionHTML(2, "Nivel de preocupación o nerviosismo.", [
+        {value:"1",label:"1 · Poco"},
+        {value:"2",label:"2"},
+        {value:"3",label:"3"},
+        {value:"4",label:"4"},
+        {value:"5",label:"5 · Mucho"}
+      ]);
+      Object.entries(questions).forEach(([container, items])=>{
+        document.getElementById(container).innerHTML = items.map(([n,t])=>questionHTML(n,t)).join("");
+      });
+    }
+    renderQuestions();
+
+    document.querySelectorAll('input[name="q1"]').forEach(el=>{
+      el.addEventListener("change", ()=>{
+        const yes = document.getElementById("q1_si").checked;
+        mainQuestions.classList.toggle("hidden", !yes);
+
+        // Cuando responde "No", las demás preguntas dejan de ser obligatorias.
+        mainQuestions.querySelectorAll("input[type=radio]").forEach(r=>r.required = yes);
+        updateProgress();
+      });
+    });
+
+    function updateProgress(){
+      const q1 = form.querySelector('input[name="q1"]:checked');
+      const yes = q1 && q1.value === "Sí";
+      const totalQuestions = yes ? 31 : 1;
+
+      let answered = 0;
+      if(q1) answered++;
+      if(yes){
+        for(let i=2;i<=31;i++){
+          if(form.querySelector(`input[name="q${i}"]:checked`)) answered++;
+        }
+      }
+      const pct = Math.round((answered/totalQuestions)*100);
+      progressBar.style.width = pct + "%";
+      progressText.textContent = pct + "%";
+    }
+    form.addEventListener("change", updateProgress);
+
+    function serializeForm(){
+      const data = Object.fromEntries(new FormData(form).entries());
+      data.timestamp = new Date().toISOString();
+      return data;
+    }
+
+    function downloadJSON(data){
+      const blob = new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "respuesta_sisco_" + Date.now() + ".json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    form.addEventListener("submit", async (e)=>{
+      e.preventDefault();
+
+      const q1 = form.querySelector('input[name="q1"]:checked');
+      const q1Error = document.getElementById("q1Error");
+      if(!q1){
+        q1Error.style.display="block";
+        document.getElementById("filterSection").scrollIntoView({behavior:"smooth",block:"center"});
+        return;
+      }
+      q1Error.style.display="none";
+
+      if(!form.checkValidity()){
+        form.reportValidity();
+        const invalid = form.querySelector(":invalid");
+        if(invalid) invalid.scrollIntoView({behavior:"smooth",block:"center"});
+        return;
+      }
+
+      const data = serializeForm();
+      const btn = form.querySelector('button[type="submit"]');
+      const status = document.getElementById("statusText");
+      btn.disabled = true;
+      btn.textContent = "Procesando…";
+      status.textContent = "Validando y registrando la respuesta.";
+
+      try{
+        if(SUBMIT_ENDPOINT){
+          const res = await fetch(SUBMIT_ENDPOINT,{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify(data)
+          });
+          if(!res.ok) throw new Error("No se pudo registrar la respuesta.");
+        }else{
+          // Modo demostración: descarga local de la respuesta.
+          downloadJSON(data);
+        }
+
+        form.classList.add("hidden");
+        finishCard.classList.remove("hidden");
+        document.getElementById("finishMessage").textContent =
+          SUBMIT_ENDPOINT
+          ? "Gracias por participar. Tus respuestas fueron enviadas correctamente."
+          : "Modo demostración: la respuesta se descargó como archivo JSON. Configure un endpoint para almacenarla en línea.";
+        window.scrollTo({top:0,behavior:"smooth"});
+      }catch(err){
+        status.textContent = "Ocurrió un problema al enviar. Verifique la conexión o el endpoint.";
+        btn.disabled = false;
+        btn.textContent = "Enviar respuestas";
+        console.error(err);
+      }
+    });
+
+    updateProgress();
+  </script>
+</body>
+</html>
